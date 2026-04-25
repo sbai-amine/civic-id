@@ -1,0 +1,16 @@
+# Local PostgreSQL for BridgeID. Usage: docker compose up -d
+# Then set DATABASE_URL=postgresql://civickey:civickey@localhost:5432/civickey
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: civickey
+      POSTGRES_PASSWORD: civickey
+      POSTGRES_DB: civickey
+    ports:
+      - "5432:5432"
+    volumes:
+      - civickey_pgdata:/var/lib/postgresql/data
+
+volumes:
+  civickey_pgdata: {}
