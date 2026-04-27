@@ -92,7 +92,7 @@ class _ServiceQrScreenState extends State<ServiceQrScreen> {
         padding: const EdgeInsets.all(24),
         children: [
           Text(
-            widget.service.name,
+            AppI18n.tOr(context, 'service.${widget.service.id}.name', widget.service.name),
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),

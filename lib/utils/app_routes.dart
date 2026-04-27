@@ -2,6 +2,8 @@
 abstract final class AppRoutes {
   static const String splash = '/';
   static const String login = '/login';
+  static const String register = '/register';
+  static const String govIssuance = '/gov-issuance';
   static const String dashboard = '/dashboard';
   static const String services = '/services';
   static const String profile = '/profile';

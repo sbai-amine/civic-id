@@ -57,10 +57,10 @@ String _randomHex(int byteCount) {
 List<int> _hexToBytes(String hex) {
   var s = hex.trim();
   if (s.length.isOdd) {
-    throw FormatException('Invalid HMAC key length');
+    throw const FormatException('Invalid HMAC key length');
   }
   if (s.isEmpty) {
-    throw FormatException('Empty HMAC key');
+    throw const FormatException('Empty HMAC key');
   }
   final out = <int>[];
   for (var i = 0; i < s.length; i += 2) {

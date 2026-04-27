@@ -38,7 +38,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    service.name,
+                    AppI18n.tOr(context, 'service.${service.id}.name', service.name),
                     style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 4),

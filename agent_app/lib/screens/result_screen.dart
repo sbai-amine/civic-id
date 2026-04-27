@@ -216,7 +216,7 @@ class _ResultScreenState extends State<ResultScreen> {
             style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
             decoration: InputDecoration(
               labelText: AppI18n.t(context, 'result.override'),
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 8),

@@ -5,37 +5,42 @@ import 'app_database.dart';
 import 'sync_status.dart';
 
 /// Persists generated service QR payloads: history + sync outbox.
+///
+/// Every query is scoped to the currently logged-in user's national ID so
+/// data is never shared across accounts on the same device.
 class OfflineQrRepository {
   OfflineQrRepository._();
 
   static final OfflineQrRepository instance = OfflineQrRepository._();
 
+  Future<String> _userId() async => await SecureTokenStorage().readUserId() ?? '';
+
   /// Pending and failed (retry) rows, syncable, oldest first.
   Future<List<PendingServiceQrRow>> fetchSyncableRows() async {
-    final nat = await SecureTokenStorage().readUserId() ?? '';
+    final nat = await _userId();
+    if (nat.isEmpty) return [];
     final db = await AppDatabase.instance();
     final rows = await db.query(
       'local_service_qr',
-      where: 'sync_status IN (?, ?) AND retry_count < 5',
-      whereArgs: [SyncStatus.pending, SyncStatus.failed],
+      where: 'sync_status IN (?, ?) AND retry_count < 5 AND national_id = ?',
+      whereArgs: [SyncStatus.pending, SyncStatus.failed, nat],
       orderBy: 'id ASC',
     );
-    final out = <PendingServiceQrRow>[];
-    for (final m in rows) {
-      if (nat.isEmpty) break;
-      out.add(PendingServiceQrRow.fromMap(m, nationalId: nat));
-    }
-    return out;
+    return rows.map((m) => PendingServiceQrRow.fromMap(m, nationalId: nat)).toList();
   }
 
   @Deprecated('Use fetchSyncableRows')
   Future<List<PendingServiceQrRow>> fetchPendingRows() => fetchSyncableRows();
 
   Future<void> repairContentHashesIfNeeded() async {
-    final nat = await SecureTokenStorage().readUserId();
-    if (nat == null || nat.isEmpty) return;
+    final nat = await _userId();
+    if (nat.isEmpty) return;
     final db = await AppDatabase.instance();
-    final rows = await db.query('local_service_qr');
+    final rows = await db.query(
+      'local_service_qr',
+      where: 'national_id = ?',
+      whereArgs: [nat],
+    );
     for (final m in rows) {
       final h = m['content_hash'] as String?;
       if (h != null && h.isNotEmpty) continue;
@@ -60,10 +65,12 @@ class OfflineQrRepository {
   }
 
   Future<int> countByStatus(String status) async {
+    final nat = await _userId();
+    if (nat.isEmpty) return 0;
     final db = await AppDatabase.instance();
     final rows = await db.rawQuery(
-      'SELECT COUNT(*) AS c FROM local_service_qr WHERE sync_status = ?',
-      [status],
+      'SELECT COUNT(*) AS c FROM local_service_qr WHERE sync_status = ? AND national_id = ?',
+      [status, nat],
     );
     final c = rows.first['c'];
     if (c is int) return c;
@@ -75,9 +82,12 @@ class OfflineQrRepository {
   Future<int> countSyncing() => countByStatus(SyncStatus.syncing);
 
   Future<int> countPending() async {
+    final nat = await _userId();
+    if (nat.isEmpty) return 0;
     final db = await AppDatabase.instance();
     final rows = await db.rawQuery(
-      "SELECT COUNT(*) AS c FROM local_service_qr WHERE sync_status = 'pending'",
+      "SELECT COUNT(*) AS c FROM local_service_qr WHERE sync_status = 'pending' AND national_id = ?",
+      [nat],
     );
     final c = rows.first['c'];
     if (c is int) return c;
@@ -86,9 +96,12 @@ class OfflineQrRepository {
   }
 
   Future<int> countFailed() async {
+    final nat = await _userId();
+    if (nat.isEmpty) return 0;
     final db = await AppDatabase.instance();
     final rows = await db.rawQuery(
-      "SELECT COUNT(*) AS c FROM local_service_qr WHERE sync_status = 'failed'",
+      "SELECT COUNT(*) AS c FROM local_service_qr WHERE sync_status = 'failed' AND national_id = ?",
+      [nat],
     );
     final c = rows.first['c'];
     if (c is int) return c;
@@ -139,11 +152,14 @@ class OfflineQrRepository {
   }
 
   Future<int> retryFailedRows({bool resetRetryCount = false}) async {
+    final nat = await _userId();
+    if (nat.isEmpty) return 0;
     final db = await AppDatabase.instance();
     return db.rawUpdate(
       resetRetryCount
-          ? "UPDATE local_service_qr SET sync_status = 'pending', last_error = NULL, retry_count = 0 WHERE sync_status = 'failed'"
-          : "UPDATE local_service_qr SET sync_status = 'pending' WHERE sync_status = 'failed'",
+          ? "UPDATE local_service_qr SET sync_status = 'pending', last_error = NULL, retry_count = 0 WHERE sync_status = 'failed' AND national_id = ?"
+          : "UPDATE local_service_qr SET sync_status = 'pending' WHERE sync_status = 'failed' AND national_id = ?",
+      [nat],
     );
   }
 
@@ -153,7 +169,7 @@ class OfflineQrRepository {
     required String serviceName,
     required String payload,
   }) async {
-    final nat = await SecureTokenStorage().readUserId() ?? '';
+    final nat = await _userId();
     if (nat.isEmpty) {
       throw StateError('User ID not set');
     }
@@ -168,6 +184,7 @@ class OfflineQrRepository {
     return db.insert(
       'local_service_qr',
       <String, Object?>{
+        'national_id': nat,
         'service_id': serviceId,
         'service_name': serviceName,
         'payload': payload,
@@ -179,11 +196,15 @@ class OfflineQrRepository {
     );
   }
 
-  /// All generated QRs, newest first.
+  /// All generated QRs for the current user, newest first.
   Future<List<ServiceQrHistoryRow>> listHistory() async {
+    final nat = await _userId();
+    if (nat.isEmpty) return [];
     final db = await AppDatabase.instance();
     final rows = await db.query(
       'local_service_qr',
+      where: 'national_id = ?',
+      whereArgs: [nat],
       orderBy: 'id DESC',
     );
     return rows.map(ServiceQrHistoryRow.fromMap).toList();

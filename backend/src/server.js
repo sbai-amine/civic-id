@@ -11,6 +11,6 @@ if (!pool) {
   console.log('[bridgeid-api] Database pool ready.');
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`BridgeID API listening on http://localhost:${PORT}`);
 });

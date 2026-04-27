@@ -101,6 +101,79 @@ async function dbLogin(req, res) {
 }
 
 /**
+ * POST /register
+ * Demo self-registration: creates a citizen account with CIN + full name + PIN.
+ * In production this endpoint would be restricted to authorized government agents.
+ */
+export async function register(req, res) {
+  if (!getPool()) {
+    return res.status(503).json({
+      success: false,
+      error: {
+        code: 'DB_UNAVAILABLE',
+        message: 'Set DATABASE_URL and run `npm run migrate` (see docker-compose.yml).',
+      },
+    });
+  }
+
+  const { nationalID, fullName, PIN } = req.body ?? {};
+  if (typeof nationalID !== 'string' || typeof PIN !== 'string') {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'VALIDATION_ERROR', message: 'Body must include string fields nationalID and PIN' },
+    });
+  }
+  const id = nationalID.trim();
+  const pin = PIN.trim();
+  const name = typeof fullName === 'string' ? fullName.trim() : '';
+
+  if (!id || !pin) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'VALIDATION_ERROR', message: 'nationalID and PIN must not be empty' },
+    });
+  }
+  if (pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'VALIDATION_ERROR', message: 'PIN must be 4–6 digits' },
+    });
+  }
+
+  const { rows: existing } = await query('SELECT id FROM users WHERE national_id = $1', [id]);
+  if (existing.length > 0) {
+    return res.status(409).json({
+      success: false,
+      error: { code: 'ALREADY_EXISTS', message: 'This national ID is already registered.' },
+    });
+  }
+
+  const passwordHash = await bcrypt.hash(pin, 12);
+  // full_name stored only if the column exists (added in init.sql for new deployments).
+  try {
+    await query(
+      'INSERT INTO users (national_id, full_name, password_hash) VALUES ($1, $2, $3)',
+      [id, name, passwordHash],
+    );
+  } catch (e) {
+    if (e.code === '42703') {
+      // column "full_name" does not exist — fall back to schema without it
+      await query(
+        'INSERT INTO users (national_id, password_hash) VALUES ($1, $2)',
+        [id, passwordHash],
+      );
+    } else {
+      throw e;
+    }
+  }
+
+  return res.status(201).json({
+    success: true,
+    data: { message: 'Account created successfully. You can now sign in with your CIN and PIN.' },
+  });
+}
+
+/**
  * POST /auth/refresh
  */
 export async function refreshAccess(req, res) {

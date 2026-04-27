@@ -100,6 +100,17 @@ app.use(
   ),
   authRoutes,
 );
+
+app.post(
+  '/register',
+  rateLimit(
+    withOptionalRedisStore('register', {
+      windowMs: 60_000,
+      max: 10,
+    }),
+  ),
+  asyncHandler(authController.register),
+);
 app.use('/services', servicesRoutes);
 app.use('/sync', syncRoutes);
 app.use('/admin', adminRoutes);

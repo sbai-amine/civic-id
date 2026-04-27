@@ -144,6 +144,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 isLoading: _loginController.isLoading,
                                 onPressed: _onLogin,
                               ),
+                              const SizedBox(height: 8),
+                              TextButton(
+                                onPressed: () => Navigator.of(context)
+                                    .pushReplacementNamed(AppRoutes.register),
+                                child: const Text(
+                                    'New here? Create a Demo Account'),
+                              ),
                             ],
                           ),
                         ),

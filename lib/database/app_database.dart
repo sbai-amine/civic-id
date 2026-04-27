@@ -6,7 +6,7 @@ class AppDatabase {
   AppDatabase._();
 
   static const _fileName = 'civickey.db';
-  static const _version = 2;
+  static const _version = 3;
 
   static Database? _instance;
 
@@ -21,6 +21,7 @@ class AppDatabase {
         await db.execute('''
           CREATE TABLE local_service_qr (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            national_id TEXT NOT NULL DEFAULT '',
             service_id TEXT NOT NULL,
             service_name TEXT NOT NULL,
             payload TEXT NOT NULL,
@@ -38,6 +39,14 @@ class AppDatabase {
           await db.execute('ALTER TABLE local_service_qr ADD COLUMN last_error TEXT');
           await db.execute(
             'ALTER TABLE local_service_qr ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 0',
+          );
+        }
+        if (oldVersion < 3) {
+          // Existing rows get empty national_id — they become invisible to
+          // all users, which is the safest default since we can't tell who
+          // created them.
+          await db.execute(
+            "ALTER TABLE local_service_qr ADD COLUMN national_id TEXT NOT NULL DEFAULT ''",
           );
         }
       },

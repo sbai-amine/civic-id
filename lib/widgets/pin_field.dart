@@ -10,12 +10,16 @@ class PinField extends StatefulWidget {
     this.validator,
     this.textInputAction = TextInputAction.done,
     this.onFieldSubmitted,
+    this.labelText,
   });
 
   final TextEditingController controller;
   final String? Function(String?)? validator;
   final TextInputAction textInputAction;
   final void Function(String)? onFieldSubmitted;
+  /// Overrides the default i18n label. Used when the same field appears twice
+  /// (e.g. "Choose PIN" vs "Confirm PIN") on the registration form.
+  final String? labelText;
 
   @override
   State<PinField> createState() => _PinFieldState();
@@ -33,7 +37,7 @@ class _PinFieldState extends State<PinField> {
       textInputAction: widget.textInputAction,
       autofillHints: const [AutofillHints.password],
       decoration: InputDecoration(
-        labelText: AppI18n.t(context, 'form.pin.label'),
+        labelText: widget.labelText ?? AppI18n.t(context, 'form.pin.label'),
         hintText: AppI18n.t(context, 'form.pin.hint'),
         prefixIcon: const Icon(Icons.lock_outline),
         suffixIcon: IconButton(

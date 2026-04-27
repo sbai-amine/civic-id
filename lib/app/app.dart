@@ -4,7 +4,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../i18n/app_i18n.dart';
 import '../screens/dashboard_screen.dart';
+import '../screens/government_issuance_screen.dart';
 import '../screens/login_screen.dart';
+import '../screens/register_screen.dart';
 import '../screens/admin_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/qr_history_screen.dart';
@@ -109,6 +111,8 @@ class _BridgeIdAppState extends State<BridgeIdApp> with WidgetsBindingObserver, 
       routes: {
         AppRoutes.splash: (_) => const SplashScreen(),
         AppRoutes.login: (_) => const LoginScreen(),
+        AppRoutes.register: (_) => const RegisterScreen(),
+        AppRoutes.govIssuance: (_) => const GovernmentIssuanceScreen(),
         AppRoutes.dashboard: (_) => const DashboardScreen(),
         AppRoutes.services: (_) => const ServicesScreen(),
         AppRoutes.profile: (_) => const ProfileScreen(),

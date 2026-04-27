@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/civic_service.dart';
 import '../models/login_credentials.dart';
+import '../models/register_request.dart';
+import '../models/register_result.dart';
 import '../models/sign_in_result.dart';
 import 'session_service.dart';
 
@@ -113,6 +115,61 @@ class ApiService {
       return const SignInFailure(
         'Something went wrong. Please try again.',
       );
+    }
+  }
+
+  /// POST `/register` — demo self-registration with CIN + name + PIN.
+  Future<RegisterResult> register(RegisterRequest request) async {
+    final uri = Uri.parse('$_baseUrl/register');
+    try {
+      final response = await _client
+          .post(
+            uri,
+            headers: const {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode(<String, String>{
+              'nationalID': request.nationalId.trim(),
+              'fullName': request.fullName.trim(),
+              'PIN': request.pin.trim(),
+            }),
+          )
+          .timeout(const Duration(seconds: 30));
+
+      Map<String, dynamic>? json;
+      try {
+        json = response.body.isEmpty ? null : jsonDecode(response.body) as Map<String, dynamic>?;
+      } catch (e, st) {
+        assert(() {
+          debugPrint('ApiService.register JSON decode: $e\n$st');
+          return true;
+        }());
+        return const RegisterFailure('Invalid response from server. Please try again later.');
+      }
+
+      if (response.statusCode == 201 && json?['success'] == true) {
+        return RegisterSuccess(nationalId: request.nationalId);
+      }
+
+      final message = _messageFromErrorJson(json) ??
+          'Registration failed (${response.statusCode}). Please try again.';
+      return RegisterFailure(message);
+    } on TimeoutException {
+      return const RegisterFailure('Request timed out. Check your connection and try again.');
+    } on http.ClientException catch (e, st) {
+      assert(() {
+        debugPrint('ApiService.register ClientException: $e\n$st');
+        return true;
+      }());
+      return const RegisterFailure(
+          'Could not reach the server. Check the API address and your network.');
+    } catch (e, st) {
+      assert(() {
+        debugPrint('ApiService.register: $e\n$st');
+        return true;
+      }());
+      return const RegisterFailure('Something went wrong. Please try again.');
     }
   }
 

@@ -88,13 +88,13 @@ class AppShell extends StatelessWidget {
 class _NavTarget {
   const _NavTarget({
     required this.destination,
-    required this.label,
+    required this.labelKey,
     required this.icon,
     required this.route,
   });
 
   final CivicDestination destination;
-  final String label;
+  final String labelKey;
   final IconData icon;
   final String route;
 }
@@ -102,25 +102,25 @@ class _NavTarget {
 const _targets = <_NavTarget>[
   _NavTarget(
     destination: CivicDestination.dashboard,
-    label: 'Dashboard',
+    labelKey: 'nav.dashboard',
     icon: Icons.dashboard_outlined,
     route: AppRoutes.dashboard,
   ),
   _NavTarget(
     destination: CivicDestination.services,
-    label: 'Services',
+    labelKey: 'nav.services',
     icon: Icons.grid_view_rounded,
     route: AppRoutes.services,
   ),
   _NavTarget(
     destination: CivicDestination.history,
-    label: 'QR history',
+    labelKey: 'nav.qrHistory',
     icon: Icons.history_rounded,
     route: AppRoutes.qrHistory,
   ),
   _NavTarget(
     destination: CivicDestination.profile,
-    label: 'Profile',
+    labelKey: 'nav.profile',
     icon: Icons.person_outline_rounded,
     route: AppRoutes.profile,
   ),
@@ -203,7 +203,7 @@ class _DesktopNavItem extends StatelessWidget {
                 Icon(target.icon, color: Colors.white),
                 const SizedBox(width: 10),
                 Text(
-                  target.label,
+                  AppI18n.t(context, target.labelKey),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -249,7 +249,7 @@ class _MobileDrawer extends StatelessWidget {
           for (final target in _targets)
             ListTile(
               leading: Icon(target.icon),
-              title: Text(target.label),
+              title: Text(AppI18n.t(context, target.labelKey)),
               selected: target.destination == current,
               onTap: () {
                 Navigator.of(context).pop();
