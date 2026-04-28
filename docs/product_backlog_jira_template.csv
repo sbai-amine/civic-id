@@ -1,0 +1,21 @@
+Priority,Epic,Story ID,User Story,Acceptance Criteria,Story Points,Sprint
+P1,Authentication,BRG-001,"As a citizen, I want to sign in with national ID and PIN so that I can access my account.","Valid credentials create a session; invalid credentials show clear error; lockout applies after failed attempts.",8,Sprint 1
+P1,Authentication,BRG-002,"As a user, I want my session to refresh automatically so that I stay logged in securely.","Access token refresh happens before expiry; failed refresh logs user out safely.",5,Sprint 1
+P1,QR Security,BRG-003,"As a citizen, I want generated service QR codes to be signed so that they cannot be tampered with.","QR includes timestamp/nonce/signature; backend verifies signature before sync acceptance.",8,Sprint 1
+P1,QR Security,BRG-004,"As a verifier, I want local anti-replay checks so that duplicate old QR scans are rejected.","Verifier rejects stale timestamps and reused nonce values on device.",5,Sprint 1
+P1,Offline Sync,BRG-005,"As a citizen, I want offline-generated records stored locally so that I can sync later.","Rows persist in SQLite with pending status and are visible in history.",5,Sprint 1
+P1,Offline Sync,BRG-006,"As a user, I want retry controls for failed sync rows so that I can recover from network failures.","Retry failed and reset queue actions update statuses correctly.",3,Sprint 1
+P1,Verifier,BRG-007,"As a verifier, I want scanned records queued offline so that field work continues without internet.","Verifier stores scans locally and uploads when connectivity returns.",5,Sprint 1
+P1,Admin Console,BRG-008,"As an admin, I want KPI cards so that I can monitor usage and operations quickly.","Admin web shows users, records, scans, and active key counts from API.",5,Sprint 2
+P1,Admin Console,BRG-009,"As an admin, I want to enable/disable verifier keys so that I can control device access.","Enable/disable actions persist and are reflected immediately in UI.",5,Sprint 2
+P1,Admin Console,BRG-010,"As an admin, I want audit logs so that operational actions are traceable.","Log list includes actor, action, timestamp, and pagination-ready endpoint.",3,Sprint 2
+P1,CI/CD,BRG-011,"As a developer, I want CI checks on pull requests so that regressions are detected early.","Workflow runs backend tests, web build, Flutter analyze/tests for both apps.",8,Sprint 2
+P1,CI/CD,BRG-012,"As a maintainer, I want automatic deployment of admin web on main so that operations dashboard updates continuously.","Successful main pipeline deploys admin-web dist to GitHub Pages.",5,Sprint 2
+P2,Localization,BRG-013,"As a user, I want language selection so that I can use the app in my preferred language.","Profile language selector persists preference and updates app locale.",3,Sprint 2
+P2,Profile,BRG-014,"As a user, I want profile and security settings so that I can control app protection behavior.","Biometric toggles persist and are enforced on app-open/sync flows.",3,Sprint 2
+P2,Reliability,BRG-015,"As a user, I want clear sync status visualization so that I know what needs action.","Dashboard chips show pending/syncing/synced/failed with meaningful messages.",3,Sprint 2
+P2,Performance,BRG-016,"As a maintainer, I want indexed sync queries so that admin/reporting endpoints remain fast.","PostgreSQL indexes exist for timeline and user/source filtering.",2,Sprint 2
+P2,Security Hardening,BRG-017,"As a platform owner, I want rate limits and secure headers so that abuse is reduced.","Login/admin/token routes rate limited; Helmet enabled; CORS configurable.",5,Sprint 3
+P2,Docs,BRG-018,"As a new contributor, I want clear setup/deployment docs so that onboarding is fast.","README and deployment guide include backend/mobile/admin setup and env vars.",2,Sprint 3
+P3,Testing,BRG-019,"As a QA lead, I want integration smoke tests so that major flows are validated each release.","Smoke tests cover app bootstrap and critical API route health.",3,Sprint 3
+P3,Release Readiness,BRG-020,"As a team, we want a 10-minute demo script so that class presentation is structured and complete.","Demo plan covers problem, architecture, backlog, CI/CD, and live walkthrough.",2,Sprint 3

@@ -93,3 +93,9 @@ flutter run --dart-define=API_BASE_URL=http://localhost:3000 --dart-define=AGENT
 ## License
 
 All rights reserved unless otherwise specified by the author.
+
+## Assessment Deliverable 3
+
+- Report: `docs/DELIVERABLE_3_REPORT.md`
+- Jira backlog import file: `docs/product_backlog_jira_template.csv`
+- CI/CD pipeline: `.github/workflows/ci-cd.yml`
