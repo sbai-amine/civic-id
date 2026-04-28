@@ -5,9 +5,8 @@ void main() {
   testWidgets('Agent app builds', (tester) async {
     await tester.pumpWidget(const BridgeIdVerifierApp());
 
-    await tester.pump(); // 👈 REQUIRED
+    await tester.pump();
 
-    // More robust check
     expect(find.byType(BridgeIdVerifierApp), findsOneWidget);
   });
 }
