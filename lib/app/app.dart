@@ -18,22 +18,44 @@ import '../services/locale_controller.dart';
 import '../services/token_storage.dart';
 import '../utils/app_routes.dart';
 
-/// Root widget: theme, routing, and Material design shell.
 class BridgeIdApp extends StatefulWidget {
-  const BridgeIdApp({super.key, this.navigatorKey});
+  const BridgeIdApp({
+    super.key,
+    this.navigatorKey,
+    this.appSettings,
+    this.tokenStorage,
+    this.biometricAuthService,
+    this.initialTestRoute, // 👈 NEW
+  });
 
   final GlobalKey<NavigatorState>? navigatorKey;
+
+  final AppSettings? appSettings;
+  final SecureTokenStorage? tokenStorage;
+  final BiometricAuthService? biometricAuthService;
+
+  final String? initialTestRoute; // 👈 NEW
 
   @override
   State<BridgeIdApp> createState() => _BridgeIdAppState();
 }
 
-class _BridgeIdAppState extends State<BridgeIdApp> with WidgetsBindingObserver, _SessionResumeLock {
+class _BridgeIdAppState extends State<BridgeIdApp>
+    with WidgetsBindingObserver, _SessionResumeLock {
   final LocaleController _locale = LocaleController.instance;
+
+  late final AppSettings _appSettings;
+  late final SecureTokenStorage _tokenStorage;
+  late final BiometricAuthService _biometric;
 
   @override
   void initState() {
     super.initState();
+
+    _appSettings = widget.appSettings ?? AppSettings();
+    _tokenStorage = widget.tokenStorage ?? SecureTokenStorage();
+    _biometric = widget.biometricAuthService ?? BiometricAuthService();
+
     WidgetsBinding.instance.addObserver(this);
     _locale.addListener(_onLocaleChanged);
     _locale.load();
@@ -53,7 +75,14 @@ class _BridgeIdAppState extends State<BridgeIdApp> with WidgetsBindingObserver, 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    onAppLifecycleForLock(state, widget.navigatorKey, () => setState(() {}));
+    onAppLifecycleForLock(
+      state,
+      widget.navigatorKey,
+      () => setState(() {}),
+      _appSettings,
+      _tokenStorage,
+      _biometric,
+    );
   }
 
   @override
@@ -76,49 +105,24 @@ class _BridgeIdAppState extends State<BridgeIdApp> with WidgetsBindingObserver, 
         ),
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFFF5F7FB),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFD3DBEA)),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFD3DBEA)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFF0F4CBA), width: 1.4),
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        ),
-        cardTheme: CardThemeData(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          elevation: 4,
-          shadowColor: const Color(0x1A0B1324),
-        ),
-        filledButtonTheme: FilledButtonThemeData(
-          style: FilledButton.styleFrom(
-            minimumSize: const Size.fromHeight(52),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            textStyle: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-        ),
       ),
-      initialRoute: AppRoutes.splash,
+
+      // 👇 THIS is the key change
+      initialRoute: widget.initialTestRoute ?? AppRoutes.splash,
+
       routes: {
-        AppRoutes.splash: (_) => const SplashScreen(),
-        AppRoutes.login: (_) => const LoginScreen(),
-        AppRoutes.register: (_) => const RegisterScreen(),
-        AppRoutes.govIssuance: (_) => const GovernmentIssuanceScreen(),
-        AppRoutes.dashboard: (_) => const DashboardScreen(),
-        AppRoutes.services: (_) => const ServicesScreen(),
-        AppRoutes.profile: (_) => const ProfileScreen(),
-        AppRoutes.qrHistory: (_) => const QrHistoryScreen(),
-        AppRoutes.admin: (_) => const AdminScreen(),
-      },
+  if (widget.initialTestRoute == null)
+    AppRoutes.splash: (_) => const SplashScreen(),
+
+  AppRoutes.login: (_) => const LoginScreen(),
+  AppRoutes.register: (_) => const RegisterScreen(),
+  AppRoutes.govIssuance: (_) => const GovernmentIssuanceScreen(),
+  AppRoutes.dashboard: (_) => const DashboardScreen(),
+  AppRoutes.services: (_) => const ServicesScreen(),
+  AppRoutes.profile: (_) => const ProfileScreen(),
+  AppRoutes.qrHistory: (_) => const QrHistoryScreen(),
+  AppRoutes.admin: (_) => const AdminScreen(),
+},
     );
   }
 }
@@ -130,26 +134,36 @@ mixin _SessionResumeLock on State<BridgeIdApp> {
     AppLifecycleState state,
     GlobalKey<NavigatorState>? navKey,
     void Function() setState,
+    AppSettings appSettings,
+    SecureTokenStorage tokenStorage,
+    BiometricAuthService biometric,
   ) async {
     if (kIsWeb) return;
+
     if (state == AppLifecycleState.paused) {
       _lastPause = DateTime.now();
       return;
     }
+
     if (state != AppLifecycleState.resumed) return;
     if (_lastPause == null) return;
-    if (DateTime.now().difference(_lastPause!) < const Duration(seconds: 1)) {
+
+    if (DateTime.now().difference(_lastPause!) <
+        const Duration(seconds: 1)) {
       return;
     }
 
-    final need = await AppSettings().requireBiometricOnAppOpen;
+    final need = await appSettings.requireBiometricOnAppOpen;
     if (!need) return;
-    final t = await SecureTokenStorage().readAccessToken();
+
+    final t = await tokenStorage.readAccessToken();
     if (t == null || t.isEmpty) return;
 
-    final ok = await BiometricAuthService().authenticate(reason: 'Unlock BridgeID');
+    final ok =
+        await biometric.authenticate(reason: 'Unlock BridgeID');
+
     if (!ok && mounted) {
-      await SecureTokenStorage().clearSession();
+      await tokenStorage.clearSession();
       navKey?.currentState?.pushNamedAndRemoveUntil(
         AppRoutes.login,
         (r) => false,

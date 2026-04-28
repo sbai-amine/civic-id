@@ -28,7 +28,7 @@ class AgentSyncApiService {
         ? stored
         : ApiConfig.agentApiKey;
     // ignore: deprecated_member_use_from_same_package
-    final legacy = ApiConfig.agentSyncSecret;
+    const legacy = ApiConfig.agentSyncSecret;
     if (runtimeKey.isEmpty && legacy.isEmpty) {
       return (
         localIds: const <int>[],
