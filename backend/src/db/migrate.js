@@ -38,6 +38,9 @@ async function run() {
   );
   await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS qr_hmac_key TEXT');
   await pool.query(
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name TEXT NOT NULL DEFAULT ''",
+  );
+  await pool.query(
     `CREATE TABLE IF NOT EXISTS audit_logs (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       actor_type TEXT NOT NULL,

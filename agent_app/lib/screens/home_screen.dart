@@ -4,6 +4,7 @@ import '../database/offline_scan_repository.dart';
 import '../i18n/app_i18n.dart';
 import '../services/agent_sync_api_service.dart';
 import '../widgets/agent_shell.dart';
+import 'agent_settings_screen.dart';
 import 'result_screen.dart';
 import 'scan_screen.dart';
 
@@ -108,6 +109,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return AgentShell(
       title: AppI18n.t(context, 'home.title'),
       current: AgentDestination.home,
+      actions: [
+        IconButton(
+          tooltip: 'Settings',
+          icon: const Icon(Icons.settings_outlined),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const AgentSettingsScreen()),
+          ),
+        ),
+      ],
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(

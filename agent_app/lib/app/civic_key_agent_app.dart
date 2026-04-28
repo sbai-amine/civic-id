@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import '../config/api_config.dart';
 import '../i18n/app_i18n.dart';
+import '../screens/agent_setup_screen.dart';
 import '../screens/home_screen.dart';
+import '../services/agent_key_storage.dart';
 
 /// Material shell for the Agent app.
 class BridgeIdVerifierApp extends StatelessWidget {
@@ -56,7 +59,46 @@ class BridgeIdVerifierApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const HomeScreen(),
+      home: const _AuthGate(),
+    );
+  }
+}
+
+/// Routes the operator to setup on first launch (no key yet) or straight to
+/// the scanner home screen on subsequent launches.
+class _AuthGate extends StatefulWidget {
+  const _AuthGate();
+
+  @override
+  State<_AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<_AuthGate> {
+  late final Future<bool> _hasKey;
+
+  @override
+  void initState() {
+    super.initState();
+    _hasKey = _check();
+  }
+
+  Future<bool> _check() async {
+    final stored = await AgentKeyStorage.instance.readKey();
+    if (stored != null && stored.isNotEmpty) return true;
+    // Allow legacy compile-time key for developer builds.
+    return ApiConfig.agentApiKey.isNotEmpty;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _hasKey,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        return (snap.data ?? false) ? const HomeScreen() : const AgentSetupScreen();
+      },
     );
   }
 }

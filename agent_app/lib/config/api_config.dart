@@ -1,7 +1,8 @@
-/// Agent API base URL and authentication.
+/// Agent API base URL and (legacy) compile-time auth fallbacks.
 ///
-/// Prefer `AGENT_API_KEY` (full key from server `npm run migrate` / admin).
-/// Optional legacy sync secret; sent only when `AGENT_API_KEY` is not configured.
+/// The runtime key issued by the admin web is stored in [AgentKeyStorage]
+/// (platform secure store) and entered via the in-app setup screen. The
+/// compile-time fields below are kept only as a fallback for developer builds.
 abstract final class ApiConfig {
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',

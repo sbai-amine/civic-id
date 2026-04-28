@@ -9,6 +9,11 @@ if (!pool) {
   );
 } else {
   console.log('[bridgeid-api] Database pool ready.');
+  // Self-healing schema patch: ensures full_name exists on legacy DBs created
+  // before the column was added to init.sql.
+  pool
+    .query("ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name TEXT NOT NULL DEFAULT ''")
+    .catch((e) => console.warn('[bridgeid-api] full_name column patch failed:', e.message));
 }
 
 app.listen(PORT, '0.0.0.0', () => {

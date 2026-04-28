@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
 import '../models/pending_scan_row.dart';
+import 'agent_key_storage.dart';
 
 /// POST `/sync/scans` with per-device API key or legacy shared header.
 class AgentSyncApiService {
@@ -22,15 +23,21 @@ class AgentSyncApiService {
     if (rows.isEmpty) {
       return (localIds: const <int>[], error: null);
     }
-    if (ApiConfig.agentApiKey.isEmpty && ApiConfig.agentSyncSecret.isEmpty) {
+    final stored = await AgentKeyStorage.instance.readKey();
+    final runtimeKey = (stored != null && stored.isNotEmpty)
+        ? stored
+        : ApiConfig.agentApiKey;
+    // ignore: deprecated_member_use_from_same_package
+    final legacy = ApiConfig.agentSyncSecret;
+    if (runtimeKey.isEmpty && legacy.isEmpty) {
       return (
         localIds: const <int>[],
-        error: 'Set AGENT_API_KEY (or legacy AGENT_SYNC_SECRET) in dart-define.',
+        error: 'No agent key set. Open Settings and paste the key from the admin web.',
       );
     }
     ({List<int> localIds, String? error})? last;
     for (var attempt = 0; attempt < 3; attempt++) {
-      last = await _postOnce(rows);
+      last = await _postOnce(rows, runtimeKey, legacy);
       if (last.error == null) return last;
       if (last.error!.contains('400') || last.error!.contains('401')) return last;
       if (attempt < 2) {
@@ -42,16 +49,19 @@ class AgentSyncApiService {
 
   Future<({List<int> localIds, String? error})> _postOnce(
     List<PendingScanRow> rows,
+    String runtimeKey,
+    String legacy,
   ) async {
     final uri = Uri.parse('$_baseUrl/sync/scans');
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
-    if (ApiConfig.agentApiKey.isNotEmpty) {
-      headers['X-API-Key'] = ApiConfig.agentApiKey;
+    if (runtimeKey.isNotEmpty) {
+      // Match the format the admin web tells the operator to use.
+      headers['Authorization'] = 'Bearer $runtimeKey';
     } else {
-      headers['X-CivicKey-Agent-Sync'] = ApiConfig.agentSyncSecret;
+      headers['X-CivicKey-Agent-Sync'] = legacy;
     }
     try {
       final response = await _client

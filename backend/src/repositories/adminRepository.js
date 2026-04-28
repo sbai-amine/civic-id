@@ -70,6 +70,27 @@ export async function setAgentKeyDisabled({ id, disabled }) {
   }
 }
 
+export async function createAgentKey({ keyId, keyHash, label }) {
+  if (!getPool()) return null;
+  const { rows } = await query(
+    `INSERT INTO agent_api_keys (key_id, key_hash, label)
+     VALUES ($1, $2, $3)
+     RETURNING id, key_id, label, disabled, created_at`,
+    [keyId, keyHash, label || 'device'],
+  );
+  return rows[0] ?? null;
+}
+
+export async function deleteAgentKey(id) {
+  if (!getPool()) return null;
+  const { rows } = await query(
+    `DELETE FROM agent_api_keys WHERE id = $1
+     RETURNING id, key_id, label`,
+    [id],
+  );
+  return rows[0] ?? null;
+}
+
 export async function listAuditLogs({ limit = 100, offset = 0, action } = {}) {
   if (!getPool()) return [];
   const l = Math.max(1, Math.min(500, Number(limit) || 100));
