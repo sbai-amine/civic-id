@@ -163,6 +163,18 @@ class OfflineQrRepository {
     );
   }
 
+  /// Resets a single failed row back to pending (and clears retry counter so
+  /// it can be re-attempted even after the auto-retry cap was reached).
+  Future<int> resetRowToPending(int id) async {
+    final nat = await _userId();
+    if (nat.isEmpty) return 0;
+    final db = await AppDatabase.instance();
+    return db.rawUpdate(
+      "UPDATE local_service_qr SET sync_status = 'pending', last_error = NULL, retry_count = 0 WHERE id = ? AND national_id = ?",
+      [id, nat],
+    );
+  }
+
   /// Inserts a new history row; returns SQLite id.
   Future<int> insertPending({
     required String serviceId,

@@ -1,19 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../i18n/app_i18n.dart';
 import '../screens/dashboard_screen.dart';
-import '../screens/government_issuance_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
-import '../screens/admin_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/qr_history_screen.dart';
 import '../screens/services_screen.dart';
 import '../screens/splash_screen.dart';
 import '../services/app_settings.dart';
 import '../services/biometric_auth_service.dart';
+import '../services/citizen_sync_service.dart';
 import '../services/locale_controller.dart';
 import '../services/token_storage.dart';
 import '../utils/app_routes.dart';
@@ -83,6 +84,11 @@ class _BridgeIdAppState extends State<BridgeIdApp>
       _tokenStorage,
       _biometric,
     );
+    if (state == AppLifecycleState.resumed) {
+      // Fire-and-forget silent retry of pending QR uploads. The citizen never
+      // sees the queue; if offline, it just leaves rows pending for next time.
+      unawaited(CitizenSyncService.instance.trigger());
+    }
   }
 
   @override
@@ -116,12 +122,10 @@ class _BridgeIdAppState extends State<BridgeIdApp>
 
   AppRoutes.login: (_) => const LoginScreen(),
   AppRoutes.register: (_) => const RegisterScreen(),
-  AppRoutes.govIssuance: (_) => const GovernmentIssuanceScreen(),
   AppRoutes.dashboard: (_) => const DashboardScreen(),
   AppRoutes.services: (_) => const ServicesScreen(),
   AppRoutes.profile: (_) => const ProfileScreen(),
   AppRoutes.qrHistory: (_) => const QrHistoryScreen(),
-  AppRoutes.admin: (_) => const AdminScreen(),
 },
     );
   }

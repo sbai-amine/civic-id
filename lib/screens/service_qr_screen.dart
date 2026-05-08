@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../database/offline_qr_repository.dart';
 import '../i18n/app_i18n.dart';
 import '../models/civic_service.dart';
+import '../services/citizen_sync_service.dart';
 import '../services/token_storage.dart';
 import '../utils/service_qr_payload.dart';
 
@@ -67,6 +70,8 @@ class _ServiceQrScreenState extends State<ServiceQrScreen> {
       );
       if (!mounted) return;
       setState(() => _pendingSaved = true);
+      // Try to upload right away. Silent if offline — the row stays pending.
+      unawaited(CitizenSyncService.instance.trigger());
     } catch (e, st) {
       assert(() {
         debugPrint('OfflineQrRepository.insertPending: $e\n$st');
@@ -95,13 +100,6 @@ class _ServiceQrScreenState extends State<ServiceQrScreen> {
             AppI18n.tOr(context, 'service.${widget.service.id}.name', widget.service.name),
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            widget.service.id,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 24),

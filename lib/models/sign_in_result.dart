@@ -9,6 +9,7 @@ final class SignInSuccess extends SignInResult {
     required this.accessToken,
     this.refreshToken,
     this.qrHmacKey,
+    this.fullName,
   });
 
   final String accessToken;
@@ -16,6 +17,10 @@ final class SignInSuccess extends SignInResult {
 
   /// Per-user HMAC key for signed service QRs (v2). Stored in secure storage.
   final String? qrHmacKey;
+
+  /// Full name as recorded at issuance. Empty/null means the column was not
+  /// populated for this user (legacy accounts before [register] added it).
+  final String? fullName;
 }
 
 /// Expected failure (validation, wrong credentials, network, etc.).

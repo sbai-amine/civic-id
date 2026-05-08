@@ -85,10 +85,12 @@ class ApiService {
         }
         final refresh = data['refreshToken'] as String?;
         final qrKey = data['qrHmacKey'] as String?;
+        final fullName = data['fullName'] as String?;
         return SignInSuccess(
           accessToken: access,
           refreshToken: refresh,
           qrHmacKey: (qrKey != null && qrKey.isNotEmpty) ? qrKey : null,
+          fullName: (fullName != null && fullName.isNotEmpty) ? fullName : null,
         );
       }
 

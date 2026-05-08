@@ -51,6 +51,7 @@ class LoginController extends ChangeNotifier {
           await _tokenStorage.saveRefreshToken(result.refreshToken);
           await _tokenStorage.saveUserId(credentials.nationalId.trim());
           await _tokenStorage.saveQrHmacKey(result.qrHmacKey);
+          await _tokenStorage.saveFullName(result.fullName);
         } catch (e, st) {
           assert(() {
             debugPrint('LoginController token save: $e\n$st');

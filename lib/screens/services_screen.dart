@@ -200,7 +200,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          service.description.isEmpty ? service.id : service.description,
+                          AppI18n.tOr(
+                            context,
+                            'service.${service.id}.description',
+                            service.description.isEmpty ? service.id : service.description,
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(

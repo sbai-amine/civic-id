@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../database/offline_scan_repository.dart';
 import '../i18n/app_i18n.dart';
+import '../services/agent_key_storage.dart';
 import '../services/agent_sync_api_service.dart';
 import '../widgets/agent_shell.dart';
 import 'agent_settings_screen.dart';
+import 'agent_setup_screen.dart';
 import 'result_screen.dart';
 import 'scan_screen.dart';
 
-/// Landing screen: scan action, sync status, and upload of pending scans.
+/// Landing screen: scan action, sync status, upload of pending scans.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -25,11 +27,19 @@ class _HomeScreenState extends State<HomeScreen> {
   int _syncingRows = 0;
   bool _syncing = false;
   String? _syncMessage;
+  String? _operatorLabel;
 
   @override
   void initState() {
     super.initState();
+    _loadOperator();
     _refreshCounts();
+  }
+
+  Future<void> _loadOperator() async {
+    final l = await AgentKeyStorage.instance.readLabel();
+    if (!mounted) return;
+    setState(() => _operatorLabel = (l ?? '').trim());
   }
 
   Future<void> _refreshCounts() async {
@@ -102,6 +112,23 @@ class _HomeScreenState extends State<HomeScreen> {
     if (context.mounted) await _refreshCounts();
   }
 
+  Future<void> _switchOperator() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const AgentSetupScreen()),
+    );
+    if (!mounted) return;
+    await _loadOperator();
+  }
+
+  bool _looksLikeAuthError(String msg) {
+    final m = msg.toLowerCase();
+    return m.contains('x-api-key') ||
+        m.contains('bearer token') ||
+        m.contains('agent-sync') ||
+        m.contains('unauthorized') ||
+        m.contains('401');
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -113,16 +140,45 @@ class _HomeScreenState extends State<HomeScreen> {
         IconButton(
           tooltip: 'Settings',
           icon: const Icon(Icons.settings_outlined),
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const AgentSettingsScreen()),
-          ),
+          onPressed: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const AgentSettingsScreen()),
+            );
+            if (!mounted) return;
+            await _loadOperator();
+            await _refreshCounts();
+          },
         ),
       ],
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildContent(theme),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: _onScanPressed,
+              icon: const Icon(Icons.qr_code_scanner),
+              label: Text(AppI18n.t(context, 'home.scanQr')),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
             DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(22),
@@ -152,13 +208,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
+            _OperatorChip(
+              label: _operatorLabel ?? '',
+              onSwitch: _switchOperator,
+            ),
+            const SizedBox(height: 14),
             Text(
               AppI18n.t(context, 'home.subtitle'),
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 22),
             Text(
               AppI18n.t(context, 'home.offlineScans'),
               style: theme.textTheme.titleMedium?.copyWith(
@@ -210,12 +271,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             if (_syncMessage != null) ...[
               const SizedBox(height: 10),
-              Text(
-                _syncMessage!,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.primary,
+              if (_looksLikeAuthError(_syncMessage!))
+                _AuthErrorBanner(onReplaceKey: _switchOperator)
+              else
+                Text(
+                  _syncMessage!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
-              ),
             ],
             const SizedBox(height: 10),
             Wrap(
@@ -248,68 +312,117 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            const Spacer(),
-            OutlinedButton(
-              onPressed: () async {
-                final ok = await showDialog<bool>(
-                  context: context,
-                  builder: (c) => AlertDialog(
-                    title: Text(AppI18n.t(context, 'home.deleteSyncedTitle')),
-                    content: Text(AppI18n.t(context, 'home.deleteSyncedBody')),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(c, false),
-                        child: Text(AppI18n.t(context, 'common.cancel')),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.pop(c, true),
-                        child: Text(AppI18n.t(context, 'common.delete')),
-                      ),
-                    ],
-                  ),
-                );
-                if (ok == true) {
-                  await OfflineScanRepository.instance.deleteSynced();
-                  if (context.mounted) await _refreshCounts();
-                }
-              },
-              child: Text(AppI18n.t(context, 'home.deleteSynced')),
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton(
-              onPressed: () async {
-                final ok = await showDialog<bool>(
-                  context: context,
-                  builder: (c) => AlertDialog(
-                    title: Text(AppI18n.t(context, 'home.clearAllTitle')),
-                    content: Text(AppI18n.t(context, 'home.clearAllBody')),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(c, false),
-                        child: Text(AppI18n.t(context, 'common.cancel')),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.pop(c, true),
-                        child: Text(AppI18n.t(context, 'common.clearAll')),
-                      ),
-                    ],
-                  ),
-                );
-                if (ok == true) {
-                  await OfflineScanRepository.instance.clearAll();
-                  if (context.mounted) await _refreshCounts();
-                }
-              },
-              child: Text(AppI18n.t(context, 'home.clearLocal')),
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: _onScanPressed,
-              icon: const Icon(Icons.qr_code_scanner),
-              label: Text(AppI18n.t(context, 'home.scanQr')),
-            ),
-            const SizedBox(height: 12),
           ],
+        );
+  }
+}
+
+class _AuthErrorBanner extends StatelessWidget {
+  const _AuthErrorBanner({required this.onReplaceKey});
+
+  final VoidCallback onReplaceKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: theme.colorScheme.errorContainer,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.lock_outline,
+                color: theme.colorScheme.onErrorContainer, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppI18n.t(context, 'home.authError.title'),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onErrorContainer,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    AppI18n.t(context, 'home.authError.body'),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onErrorContainer,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            FilledButton.tonal(
+              onPressed: onReplaceKey,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 38),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+              ),
+              child: Text(AppI18n.t(context, 'home.authError.replaceKey')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OperatorChip extends StatelessWidget {
+  const _OperatorChip({required this.label, required this.onSwitch});
+
+  final String label;
+  final VoidCallback onSwitch;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final shown = label.isEmpty ? AppI18n.t(context, 'home.operator.unnamed') : label;
+    return Material(
+      color: theme.colorScheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onSwitch,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: [
+              const Icon(Icons.person_outline, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppI18n.t(context, 'home.operator.label'),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    Text(
+                      shown,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              TextButton(
+                onPressed: onSwitch,
+                child: Text(AppI18n.t(context, 'home.operator.switch')),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -332,7 +445,7 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 122,
+      width: 132,
       child: Material(
         color: color,
         borderRadius: BorderRadius.circular(12),

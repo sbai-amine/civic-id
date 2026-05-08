@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../database/offline_scan_repository.dart';
@@ -23,6 +24,7 @@ class _ResultScreenState extends State<ResultScreen> {
   bool _persisted = false;
   String? _persistError;
   String? _localInvalidReason;
+  bool _idRevealed = false;
 
   @override
   void initState() {
@@ -162,10 +164,10 @@ class _ResultScreenState extends State<ResultScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            _ResultTile(
-              label: AppI18n.t(context, 'result.userId'),
-              value: parsed.userId,
-              icon: Icons.person_outline,
+            _UserIdTile(
+              userId: parsed.userId,
+              revealed: _idRevealed,
+              onToggle: () => setState(() => _idRevealed = !_idRevealed),
             ),
             const SizedBox(height: 12),
             _ResultTile(
@@ -207,54 +209,120 @@ class _ResultScreenState extends State<ResultScreen> {
             ),
           ],
           const SizedBox(height: 32),
-          const SizedBox(height: 8),
-          Text(AppI18n.t(context, 'result.testPayload'), style: theme.textTheme.titleSmall),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _testPayload,
-            maxLines: 4,
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-            decoration: InputDecoration(
-              labelText: AppI18n.t(context, 'result.override'),
-              border: const OutlineInputBorder(),
+          if (kDebugMode) ...[
+            Text(AppI18n.t(context, 'result.testPayload'), style: theme.textTheme.titleSmall),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _testPayload,
+              maxLines: 4,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+              decoration: InputDecoration(
+                labelText: AppI18n.t(context, 'result.override'),
+                border: const OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          OutlinedButton(
-            onPressed: () async {
-              final t = _testPayload.text;
-              if (t.trim().isEmpty) return;
-              final p = DecodedQrPayload.tryParse(t);
-              try {
-                await OfflineScanRepository.instance.insertPending(
-                  rawPayload: t,
-                  userId: p?.userId,
-                  payloadTimestamp: p?.timestamp,
-                  parseOk: p != null,
-                );
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(AppI18n.t(context, 'result.savedTestRow')),
-                    ),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () async {
+                final t = _testPayload.text;
+                if (t.trim().isEmpty) return;
+                final p = DecodedQrPayload.tryParse(t);
+                try {
+                  await OfflineScanRepository.instance.insertPending(
+                    rawPayload: t,
+                    userId: p?.userId,
+                    payloadTimestamp: p?.timestamp,
+                    parseOk: p != null,
                   );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(AppI18n.t(context, 'result.savedTestRow')),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed: $e')),
+                    );
+                  }
                 }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed: $e')),
-                  );
-                }
-              }
-            },
-            child: Text(AppI18n.t(context, 'result.saveAdditional')),
-          ),
+              },
+              child: Text(AppI18n.t(context, 'result.saveAdditional')),
+            ),
+            const SizedBox(height: 8),
+          ],
           FilledButton(
             onPressed: () =>
                 Navigator.of(context).popUntil((route) => route.isFirst),
             child: Text(AppI18n.t(context, 'result.done')),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _UserIdTile extends StatelessWidget {
+  const _UserIdTile({
+    required this.userId,
+    required this.revealed,
+    required this.onToggle,
+  });
+
+  final String userId;
+  final bool revealed;
+  final VoidCallback onToggle;
+
+  String _redacted(String id) {
+    if (id.length <= 4) return '•' * id.length;
+    return '${'•' * (id.length - 4)}${id.substring(id.length - 4)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      elevation: 0,
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.person_outline, color: theme.colorScheme.primary),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppI18n.t(context, 'result.userId'),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  SelectableText(
+                    revealed ? userId : _redacted(userId),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            TextButton.icon(
+              onPressed: onToggle,
+              icon: Icon(revealed ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                  size: 18),
+              label: Text(AppI18n.t(
+                  context, revealed ? 'result.hideId' : 'result.revealId')),
+            ),
+          ],
+        ),
       ),
     );
   }

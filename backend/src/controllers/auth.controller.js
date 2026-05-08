@@ -96,6 +96,7 @@ async function dbLogin(req, res) {
       expiresIn: ACCESS_TOKEN_EXPIRES,
       refreshExpiresIn: REFRESH_TOKEN_EXPIRES,
       qrHmacKey,
+      fullName: typeof user.full_name === 'string' ? user.full_name : '',
     },
   });
 }

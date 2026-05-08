@@ -13,7 +13,7 @@ import '../widgets/primary_button.dart';
 /// Demo self-registration screen.
 ///
 /// Clearly labelled as demo mode — real deployment uses government-gated
-/// issuance (see [GovernmentIssuanceScreen]).
+/// issuance (lives in the verifier app's debug-only demo tools).
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -194,33 +194,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 onPressed: _onRegister,
                               ),
                               const SizedBox(height: 20),
-                              const Row(
-                                children: [
-                                  Expanded(child: Divider()),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 12),
-                                    child: Text('or'),
-                                  ),
-                                  Expanded(child: Divider()),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              OutlinedButton.icon(
-                                onPressed: () => Navigator.of(context)
-                                    .pushNamed(AppRoutes.govIssuance),
-                                icon: const Icon(
-                                    Icons.account_balance_outlined),
-                                label: const Text(
-                                    'Government Issuance Portal (Simulated)'),
-                                style: OutlinedButton.styleFrom(
-                                  minimumSize: const Size.fromHeight(52),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
                               TextButton(
                                 onPressed: () => Navigator.of(context)
                                     .pushReplacementNamed(AppRoutes.login),
@@ -273,7 +246,7 @@ class _DemoModeBanner extends StatelessWidget {
                   ),
                   TextSpan(
                     text:
-                        'In a real deployment, CivicKey accounts are issued by authorized government agents after in-person identity verification. This ensures your digital identity is legally bound to your physical identity.',
+                        'In a real deployment, BridgeID accounts are issued by authorized government agents after in-person identity verification. This ensures your digital identity is legally bound to your physical identity.',
                   ),
                 ],
               ),

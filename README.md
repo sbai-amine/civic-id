@@ -32,7 +32,7 @@ Digital identity and civic services companion: secure sign-in, service catalog, 
 ### 1. Clone
 
 ```bash
-git clone https://github.com/aliiahmeeed999-hub/bridgeID.git
+git clone https://github.com/sbai-amine/civic-id
 cd bridgeID
 ```
 
@@ -65,7 +65,7 @@ From the repo root (citizen app):
 
 ```bash
 flutter pub get
-flutter run --dart-define=API_BASE_URL=http://localhost:3000
+flutter run --dart-define=API_BASE_URL=https://civic-id-production.up.railway.app
 ```
 
 Verifier app:

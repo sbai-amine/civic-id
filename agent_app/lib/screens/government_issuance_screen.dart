@@ -3,16 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../models/register_request.dart';
-import '../models/register_result.dart';
-import '../services/api_service.dart';
-import '../utils/app_routes.dart';
-import '../utils/validators.dart';
-import '../widgets/national_id_field.dart';
+import '../services/register_api_service.dart';
 
-/// Simulated government agent portal that demonstrates the real CivicKey
-/// issuance flow: agent verifies physical ID, system creates account,
-/// citizen receives a temporary PIN.
+/// Simulated government issuance flow. Demonstrates how a BridgeID account is
+/// created after in-person identity verification. Reachable only from the
+/// verifier app's settings screen, and only in debug builds.
 class GovernmentIssuanceScreen extends StatefulWidget {
   const GovernmentIssuanceScreen({super.key});
 
@@ -49,6 +44,11 @@ class _GovernmentIssuanceScreenState extends State<GovernmentIssuanceScreen> {
     return List.generate(6, (_) => rng.nextInt(10)).join();
   }
 
+  String? _validateNotEmpty(String? value, String label) {
+    if ((value?.trim() ?? '').isEmpty) return '$label cannot be empty';
+    return null;
+  }
+
   void _onStepContinue() {
     switch (_currentStep) {
       case 0:
@@ -82,17 +82,12 @@ class _GovernmentIssuanceScreenState extends State<GovernmentIssuanceScreen> {
   }
 
   Future<void> _issueAccountWithPin(String pin) async {
-    // Simulated processing delay — mimics server-side identity binding.
     await Future.delayed(const Duration(milliseconds: 1800));
-
-    final result = await ApiService().register(
-      RegisterRequest(
-        nationalId: _cinController.text.trim(),
-        fullName: _fullNameController.text.trim(),
-        pin: pin,
-      ),
+    final result = await RegisterApiService().register(
+      nationalId: _cinController.text.trim(),
+      fullName: _fullNameController.text.trim(),
+      pin: pin,
     );
-
     if (!mounted) return;
     setState(() {
       _isIssuing = false;
@@ -124,8 +119,7 @@ class _GovernmentIssuanceScreenState extends State<GovernmentIssuanceScreen> {
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 12),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: const Color(0xFFFFF8E1),
               borderRadius: BorderRadius.circular(20),
@@ -147,8 +141,7 @@ class _GovernmentIssuanceScreenState extends State<GovernmentIssuanceScreen> {
         children: [
           Container(
             width: double.infinity,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             color: const Color(0xFFE3F2FD),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +151,7 @@ class _GovernmentIssuanceScreenState extends State<GovernmentIssuanceScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'In production, this portal is only accessible to authorized government agents. It demonstrates how CivicKey accounts are created after in-person identity verification.',
+                    'In production, this portal is only accessible to authorized government agents. It demonstrates how BridgeID accounts are created after in-person identity verification.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: const Color(0xFF0D47A1),
                       height: 1.4,
@@ -216,9 +209,15 @@ class _GovernmentIssuanceScreenState extends State<GovernmentIssuanceScreen> {
                     key: _step1FormKey,
                     child: Column(
                       children: [
-                        NationalIdField(
+                        TextFormField(
                           controller: _cinController,
-                          validator: Validators.nationalId,
+                          textInputAction: TextInputAction.next,
+                          decoration: const InputDecoration(
+                            labelText: 'National ID',
+                            prefixIcon: Icon(Icons.badge_outlined),
+                          ),
+                          validator: (v) =>
+                              _validateNotEmpty(v, 'National ID'),
                           onFieldSubmitted: (_) =>
                               FocusScope.of(context).nextFocus(),
                         ),
@@ -232,7 +231,7 @@ class _GovernmentIssuanceScreenState extends State<GovernmentIssuanceScreen> {
                             hintText: 'As printed on the national ID',
                             prefixIcon: Icon(Icons.person_outline),
                           ),
-                          validator: Validators.fullName,
+                          validator: (v) => _validateNotEmpty(v, 'Full name'),
                         ),
                       ],
                     ),
@@ -306,8 +305,7 @@ class _GovernmentIssuanceScreenState extends State<GovernmentIssuanceScreen> {
         nationalId: _cinController.text.trim(),
         fullName: _fullNameController.text.trim(),
         generatedPin: _generatedPin!,
-        onDone: () => Navigator.of(context)
-            .pushNamedAndRemoveUntil(AppRoutes.login, (r) => false),
+        onDone: () => Navigator.of(context).pop(),
         onIssueAnother: _resetAll,
       );
     }
@@ -484,7 +482,7 @@ class _IssuanceSuccessCard extends StatelessWidget {
               SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Inform the citizen of their temporary PIN. They must sign in and set a personal PIN immediately.',
+                  'Inform the citizen of their temporary PIN. They must sign in to the citizen app and set a personal PIN immediately.',
                   style: TextStyle(
                       fontSize: 12, color: Color(0xFF5D4037), height: 1.4),
                 ),
@@ -495,8 +493,8 @@ class _IssuanceSuccessCard extends StatelessWidget {
         const SizedBox(height: 16),
         FilledButton.icon(
           onPressed: onDone,
-          icon: const Icon(Icons.login),
-          label: const Text('Proceed to Citizen Login'),
+          icon: const Icon(Icons.done),
+          label: const Text('Close'),
         ),
         const SizedBox(height: 8),
         TextButton(
@@ -521,11 +519,10 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         children: [
           Text('$label: ',
-              style: const TextStyle(
-                  fontSize: 13, color: Color(0xFF616161))),
+              style: const TextStyle(fontSize: 13, color: Color(0xFF616161))),
           Text(value,
-              style: const TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w600)),
+              style:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       ),
     );

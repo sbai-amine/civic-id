@@ -19,10 +19,38 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   final _cryptoApi = CryptoApiService();
   bool _signing = false;
 
+  /// Returns the localized required-documents list for [service]. The i18n key
+  /// stores items joined by `\n`; falls back to the backend list verbatim.
+  List<String> _localizedRequiredDocs(BuildContext context, CivicService service) {
+    final joined = service.requiredDocuments.join('\n');
+    final localized = AppI18n.tOr(
+      context,
+      'service.${service.id}.requiredDocs',
+      joined,
+    );
+    return localized
+        .split('\n')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final service = widget.service;
+
+    final description = AppI18n.tOr(
+      context,
+      'service.${service.id}.description',
+      service.description,
+    );
+    final fees = AppI18n.tOr(
+      context,
+      'service.${service.id}.fees',
+      service.fees,
+    );
+    final docs = _localizedRequiredDocs(context, service);
 
     return Scaffold(
       appBar: AppBar(
@@ -41,18 +69,11 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                     AppI18n.tOr(context, 'service.${service.id}.name', service.name),
                     style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    service.id,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
                 ],
               ),
             ),
           ),
-          if (service.description.isNotEmpty) ...[
+          if (description.isNotEmpty) ...[
             const SizedBox(height: 20),
             Card(
               child: Padding(
@@ -63,7 +84,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                     Text(AppI18n.t(context, 'serviceDetail.description'), style: theme.textTheme.titleSmall),
                     const SizedBox(height: 8),
                     Text(
-                      service.description,
+                      description,
                       style: theme.textTheme.bodyLarge,
                     ),
                   ],
@@ -71,7 +92,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               ),
             ),
           ],
-          if (service.fees.isNotEmpty) ...[
+          if (fees.isNotEmpty) ...[
             const SizedBox(height: 20),
             Card(
               child: Padding(
@@ -81,13 +102,13 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   children: [
                     Text(AppI18n.t(context, 'serviceDetail.fees'), style: theme.textTheme.titleSmall),
                     const SizedBox(height: 8),
-                    Text(service.fees, style: theme.textTheme.bodyLarge),
+                    Text(fees, style: theme.textTheme.bodyLarge),
                   ],
                 ),
               ),
             ),
           ],
-          if (service.requiredDocuments.isNotEmpty) ...[
+          if (docs.isNotEmpty) ...[
             const SizedBox(height: 20),
             Card(
               child: Padding(
@@ -97,7 +118,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   children: [
                     Text(AppI18n.t(context, 'serviceDetail.requiredDocs'), style: theme.textTheme.titleSmall),
                     const SizedBox(height: 8),
-                    ...service.requiredDocuments.map(
+                    ...docs.map(
                       (d) => Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Row(
@@ -124,7 +145,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               );
             },
             icon: const Icon(Icons.qr_code_2),
-            label: Text(AppI18n.t(context, 'serviceDetail.generateQr')),
+            label: Text(AppI18n.t(context, 'serviceDetail.showAtCounter')),
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
@@ -174,11 +195,13 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.draw_outlined),
-            label: Text(_signing ? AppI18n.t(context, 'serviceDetail.signing') : AppI18n.t(context, 'serviceDetail.signNow')),
+            label: Text(_signing
+                ? AppI18n.t(context, 'serviceDetail.signing')
+                : AppI18n.t(context, 'serviceDetail.submitSigned')),
           ),
           const SizedBox(height: 8),
           Text(
-            AppI18n.t(context, 'serviceDetail.signHint'),
+            AppI18n.t(context, 'serviceDetail.actionsHint'),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

@@ -10,6 +10,7 @@ class SecureTokenStorage {
   static const _userIdKey = 'civickey.user_id';
   static const _lastSyncKey = 'civickey.last_sync_iso';
   static const _qrHmacKey = 'civickey.qr_hmac_key';
+  static const _fullNameKey = 'civickey.full_name';
 
   final FlutterSecureStorage _storage;
 
@@ -41,7 +42,18 @@ class SecureTokenStorage {
     await _storage.delete(key: _refreshKey);
     await _storage.delete(key: _userIdKey);
     await _storage.delete(key: _qrHmacKey);
+    await _storage.delete(key: _fullNameKey);
   }
+
+  Future<void> saveFullName(String? name) async {
+    if (name == null || name.trim().isEmpty) {
+      await _storage.delete(key: _fullNameKey);
+    } else {
+      await _storage.write(key: _fullNameKey, value: name.trim());
+    }
+  }
+
+  Future<String?> readFullName() => _storage.read(key: _fullNameKey);
 
   Future<void> clearJwt() => clearSession();
 

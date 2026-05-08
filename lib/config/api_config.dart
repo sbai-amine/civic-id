@@ -7,10 +7,4 @@ abstract final class ApiConfig {
     'API_BASE_URL',
     defaultValue: 'http://127.0.0.1:3000',
   );
-
-  /// Optional admin key for in-app admin panel.
-  static const String adminApiKey = String.fromEnvironment(
-    'ADMIN_API_KEY',
-    defaultValue: '',
-  );
 }

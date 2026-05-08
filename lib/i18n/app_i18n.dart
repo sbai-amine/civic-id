@@ -43,6 +43,10 @@ class AppI18n {
       'profile.never': 'Never',
       'profile.appVersion': 'App version',
       'profile.nationalId': 'National ID',
+      'profile.unnamedAccount': 'Account',
+      'profile.about': 'About',
+      'profile.bioOpen.subtitle':
+          'Re-authenticate every time the app is opened.',
       'profile.bioOpen': 'Lock with biometrics on open',
       'profile.bioSync': 'Require biometrics to sync',
       'profile.appLanguage': 'App language',
@@ -78,7 +82,19 @@ class AppI18n {
           'Browse official services, fees, and required documents.',
       'dashboard.recent.title': 'Recent activity',
       'dashboard.recent.empty': 'No activity yet. Generate your first service QR.',
+      'dashboard.recent.seeAll': 'See all',
       'dashboard.browseServices': 'View all services',
+      'dashboard.offlineBanner':
+          "Working offline — your QR codes will upload when you're back online.",
+      'profile.accountVerified': 'Identity verified',
+      'history.couldNotSave': "Couldn't save this QR to your account.",
+      'history.status.submitted': 'Submitted',
+      'history.status.savedOnDevice': 'Saved on this device',
+      'history.status.couldNotSave': "Couldn't save",
+      'serviceDetail.showAtCounter': 'Show QR at the counter',
+      'serviceDetail.submitSigned': 'Submit signed request',
+      'serviceDetail.actionsHint':
+          'Show the QR if you are at a counter, or submit a signed request to handle it remotely.',
       'services.notSignedIn': 'No saved session. Sign in again to load services.',
       'services.loadFailed': 'Could not load services',
       'services.empty': 'No services available',
@@ -167,6 +183,9 @@ class AppI18n {
       'profile.never': 'أبداً',
       'profile.appVersion': 'إصدار التطبيق',
       'profile.nationalId': 'رقم الهوية الوطنية',
+      'profile.unnamedAccount': 'الحساب',
+      'profile.about': 'حول',
+      'profile.bioOpen.subtitle': 'إعادة المصادقة عند كل فتح للتطبيق.',
       'profile.bioOpen': 'قفل بالبيومترية عند الفتح',
       'profile.bioSync': 'المزامنة تتطلب بيومترية',
       'profile.appLanguage': 'لغة التطبيق',
@@ -191,7 +210,19 @@ class AppI18n {
       'dashboard.services.subtitle': 'تصفح الخدمات الرسمية والرسوم والمستندات المطلوبة.',
       'dashboard.recent.title': 'النشاط الأخير',
       'dashboard.recent.empty': 'لا نشاط حتى الآن. أنشئ أول رمز QR للخدمة.',
+      'dashboard.recent.seeAll': 'عرض الكل',
       'dashboard.browseServices': 'عرض كل الخدمات',
+      'dashboard.offlineBanner':
+          'تعمل دون اتصال — سيتم رفع رموز QR عند عودة الإنترنت.',
+      'profile.accountVerified': 'الهوية مؤكَّدة',
+      'history.couldNotSave': 'تعذّر حفظ رمز QR في حسابك.',
+      'history.status.submitted': 'مُرسَل',
+      'history.status.savedOnDevice': 'محفوظ على هذا الجهاز',
+      'history.status.couldNotSave': 'تعذّر الحفظ',
+      'serviceDetail.showAtCounter': 'اعرض رمز QR عند الشبّاك',
+      'serviceDetail.submitSigned': 'إرسال طلب موقَّع',
+      'serviceDetail.actionsHint':
+          'اعرض رمز QR في الشبّاك، أو أرسل طلباً موقَّعاً عن بُعد.',
       'services.title': 'الخدمات',
       'services.notSignedIn': 'لا توجد جلسة. سجّل الدخول مجدداً.',
       'services.loadFailed': 'تعذّر تحميل الخدمات',
@@ -244,6 +275,88 @@ class AppI18n {
       'admin.verifyDocId': 'معرّف المستند الموقَّع',
       'admin.verifySignature': 'التحقق من التوقيع',
       'admin.signatureValid': 'التوقيع صحيح: {ok}\nرمز البيانات: {hash}',
+      'service.birth_certificate.description':
+          'طلب رسمي للحصول على نسخة مصدقة من شهادة الازدياد من سجل الحالة المدنية.',
+      'service.birth_certificate.fees':
+          '5,00 درهم — معالجة في نفس اليوم حسب التوفر',
+      'service.birth_certificate.requiredDocs':
+          'البطاقة الوطنية للوالد أو الولي\nكناش الحالة المدنية\nموافقة الوالد إذا كان قاصراً',
+      'service.national_id_renewal.description':
+          'تجديد أو استبدال البطاقة الوطنية الإلكترونية (CNIE).',
+      'service.national_id_renewal.fees':
+          'مجاني للاستبدال الأول — 40,00 درهم للاستبدالات اللاحقة',
+      'service.national_id_renewal.requiredDocs':
+          'البطاقة الوطنية المنتهية الصلاحية أو التالفة\nصورتان شخصيتان\nشهادة الازدياد',
+      'service.passport_application.description':
+          'طلب جواز سفر مغربي جديد أو تجديد جواز قائم.',
+      'service.passport_application.fees':
+          '500,00 درهم — معالجة قياسية (4 إلى 6 أسابيع)',
+      'service.passport_application.requiredDocs':
+          'البطاقة الوطنية\nشهادة الازدياد\n4 صور شخصية\nإثبات السكن\nطابع جبائي',
+      'service.family_record_book.description':
+          'وثيقة رسمية تسجل تكوين الأسرة، تُسلَّم عند الزواج أو الازدياد.',
+      'service.family_record_book.fees': 'مجاني',
+      'service.family_record_book.requiredDocs':
+          'عقد الزواج\nالبطاقة الوطنية لكلا الزوجين\nشهادات ازدياد الأبناء عند الاقتضاء',
+      'service.marriage_certificate.description':
+          'نسخة مصدقة من عقد زواج من سجل الحالة المدنية.',
+      'service.marriage_certificate.fees': '5,00 درهم',
+      'service.marriage_certificate.requiredDocs':
+          'البطاقة الوطنية لكلا الزوجين\nرقم مرجع عقد الزواج الأصلي',
+      'service.death_certificate.description':
+          'نسخة رسمية مصدقة من شهادة وفاة من سجل الحالة المدنية.',
+      'service.death_certificate.fees': '5,00 درهم',
+      'service.death_certificate.requiredDocs':
+          'البطاقة الوطنية لأحد أفراد الأسرة\nمعلومات هوية المتوفى\nشهادة الوفاة الطبية إن وُجدت',
+      'service.residence_certificate.description':
+          'إثبات رسمي للسكنى تصدره المقاطعة أو الجماعة المحلية للتحقق من العنوان.',
+      'service.residence_certificate.fees': '10,00 درهم',
+      'service.residence_certificate.requiredDocs':
+          'البطاقة الوطنية\nفاتورة (ماء/كهرباء — آخر 3 أشهر) أو عقد كراء\nعقد الكراء أو سند الملكية عند الطلب',
+      'service.certificate_of_life.description':
+          'شهادة الحياة المطلوبة من صناديق التقاعد والسلطات الأجنبية.',
+      'service.certificate_of_life.fees': '10,00 درهم',
+      'service.certificate_of_life.requiredDocs':
+          'البطاقة الوطنية\nشهادة طبية حديثة أو الحضور الشخصي إلى الجماعة',
+      'service.driving_license_application.description':
+          'طلب رخصة سياقة مغربية (الصنف B) لأول مرة.',
+      'service.driving_license_application.fees':
+          '300,00 درهم — الصنف B (تختلف رسوم السيارة/الدراجة القياسية)',
+      'service.driving_license_application.requiredDocs':
+          'البطاقة الوطنية\nشهادة طبية للأهلية\nإثبات اجتياز الاختبار النظري والتطبيقي\n4 صور شخصية',
+      'service.vehicle_registration.description':
+          'تسجيل عربة جديدة أو محوَّلة لدى مصلحة النقل.',
+      'service.vehicle_registration.fees':
+          'يختلف حسب نوع العربة والقوة الجبائية — ابتداءً من 350,00 درهم',
+      'service.vehicle_registration.requiredDocs':
+          'البطاقة الوطنية\nفاتورة شراء العربة أو وثيقة التحويل\nشهادة التأمين\nشهادة الفحص التقني',
+      'service.social_security_enrollment.description':
+          'التسجيل في نظام الضمان الاجتماعي للتأمين الصحي والتعويضات العائلية والتقاعد.',
+      'service.social_security_enrollment.fees':
+          'مجاني — يتولى رب العمل التسجيل',
+      'service.social_security_enrollment.requiredDocs':
+          'البطاقة الوطنية\nعقد العمل أو تصريح رب العمل\nشهادة الازدياد\nالبيانات البنكية (RIB)',
+      'service.ramed_enrollment.description':
+          'التسجيل في برنامج المساعدة الطبية للأسر ذات الدخل المحدود.',
+      'service.ramed_enrollment.fees': 'مجاني — استحقاق حسب الدخل',
+      'service.ramed_enrollment.requiredDocs':
+          'البطاقة الوطنية\nإثبات الدخل أو شهادة العوز\nكناش الحالة المدنية',
+      'service.land_registry_extract.description':
+          'مستخرج رسمي من المحافظة العقارية يؤكد ملكية العقار ووضعه القانوني.',
+      'service.land_registry_extract.fees': '150,00 درهم',
+      'service.land_registry_extract.requiredDocs':
+          'البطاقة الوطنية\nرقم الرسم العقاري\nاستمارة طلب مكتملة',
+      'service.judicial_record.description':
+          'شهادة رسمية للسوابق العدلية، مطلوبة للتوظيف وتأشيرات السفر والإجراءات الإدارية.',
+      'service.judicial_record.fees':
+          'مجاني — تُعالَج في المحكمة المحلية أو عبر الخدمات الإلكترونية',
+      'service.judicial_record.requiredDocs':
+          'البطاقة الوطنية\nشهادة الازدياد',
+      'service.tax_clearance_certificate.description':
+          'شهادة من إدارة الضرائب تؤكد عدم وجود ديون ضريبية مستحقة.',
+      'service.tax_clearance_certificate.fees': 'مجاني',
+      'service.tax_clearance_certificate.requiredDocs':
+          'البطاقة الوطنية أو رقم تسجيل الشركة\nالرقم الضريبي\nآخر تصريح ضريبي',
     },
     'fr': {
       'common.retry': 'Réessayer',
@@ -285,6 +398,10 @@ class AppI18n {
       'profile.never': 'Jamais',
       'profile.appVersion': 'Version',
       'profile.nationalId': 'Numéro CIN',
+      'profile.unnamedAccount': 'Compte',
+      'profile.about': 'À propos',
+      'profile.bioOpen.subtitle':
+          'Re-authentification à chaque ouverture de l\'application.',
       'profile.bioOpen': 'Biométrie à l\'ouverture',
       'profile.bioSync': 'Biométrie pour la sync',
       'profile.appLanguage': 'Langue',
@@ -309,7 +426,19 @@ class AppI18n {
       'dashboard.services.subtitle': 'Parcourez les services officiels, les frais et les documents requis.',
       'dashboard.recent.title': 'Activité récente',
       'dashboard.recent.empty': 'Aucune activité. Générez votre premier QR de service.',
+      'dashboard.recent.seeAll': 'Tout voir',
       'dashboard.browseServices': 'Voir tous les services',
+      'dashboard.offlineBanner':
+          'Hors ligne — vos QR seront envoyés dès le retour de la connexion.',
+      'profile.accountVerified': 'Identité vérifiée',
+      'history.couldNotSave': "Impossible d'enregistrer ce QR dans votre compte.",
+      'history.status.submitted': 'Envoyé',
+      'history.status.savedOnDevice': 'Enregistré sur cet appareil',
+      'history.status.couldNotSave': 'Échec d\'enregistrement',
+      'serviceDetail.showAtCounter': 'Présenter le QR au guichet',
+      'serviceDetail.submitSigned': 'Envoyer une demande signée',
+      'serviceDetail.actionsHint':
+          'Présentez le QR au guichet, ou envoyez une demande signée à distance.',
       'services.title': 'Services',
       'services.notSignedIn': 'Pas de session. Reconnectez-vous pour charger les services.',
       'services.loadFailed': 'Impossible de charger les services',
@@ -362,6 +491,90 @@ class AppI18n {
       'admin.verifyDocId': 'ID du document signé',
       'admin.verifySignature': 'Vérifier la signature',
       'admin.signatureValid': 'Signature valide : {ok}\nHash du payload : {hash}',
+      // Service catalog: localized description / fees / required documents
+      // (newline-separated; the screen splits on \n into bullet items).
+      'service.birth_certificate.description':
+          "Demande officielle d'une copie certifiée d'un acte de naissance auprès du registre civil.",
+      'service.birth_certificate.fees':
+          '5,00 DH — traitement le jour même selon disponibilité',
+      'service.birth_certificate.requiredDocs':
+          "CIN du parent ou tuteur légal\nLivret de famille\nConsentement parental si mineur",
+      'service.national_id_renewal.description':
+          "Renouvellement ou remplacement de la carte d'identité nationale électronique (CNIE).",
+      'service.national_id_renewal.fees':
+          'Gratuit pour le premier remplacement — 40,00 DH ensuite',
+      'service.national_id_renewal.requiredDocs':
+          "CNIE périmée ou abîmée\n2 photos d'identité\nActe de naissance",
+      'service.passport_application.description':
+          "Demande d'un nouveau passeport marocain ou renouvellement d'un passeport existant.",
+      'service.passport_application.fees':
+          '500,00 DH — traitement standard (4 à 6 semaines)',
+      'service.passport_application.requiredDocs':
+          "CNIE\nActe de naissance\n4 photos d'identité\nJustificatif de résidence\nTimbre fiscal",
+      'service.family_record_book.description':
+          "Document officiel attestant la composition familiale, délivré au mariage ou à la naissance.",
+      'service.family_record_book.fees': 'Gratuit',
+      'service.family_record_book.requiredDocs':
+          "Acte de mariage\nCNIE des deux époux\nActes de naissance des enfants le cas échéant",
+      'service.marriage_certificate.description':
+          "Copie certifiée d'un acte de mariage du registre civil.",
+      'service.marriage_certificate.fees': '5,00 DH',
+      'service.marriage_certificate.requiredDocs':
+          "CNIE des deux époux\nNuméro de référence de l'acte de mariage original",
+      'service.death_certificate.description':
+          "Copie officielle certifiée d'un acte de décès du registre civil.",
+      'service.death_certificate.fees': '5,00 DH',
+      'service.death_certificate.requiredDocs':
+          "CIN du membre de famille demandeur\nInformations d'identité du défunt\nCertificat médical de décès si disponible",
+      'service.residence_certificate.description':
+          "Justificatif officiel de résidence délivré par la commune ou l'autorité de district pour vérification d'adresse.",
+      'service.residence_certificate.fees': '10,00 DH',
+      'service.residence_certificate.requiredDocs':
+          "CNIE\nFacture (eau/électricité — 3 derniers mois) ou bail\nContrat de location ou titre de propriété si demandé",
+      'service.certificate_of_life.description':
+          "Certificat de vie requis par les caisses de retraite et les autorités étrangères.",
+      'service.certificate_of_life.fees': '10,00 DH',
+      'service.certificate_of_life.requiredDocs':
+          "CNIE\nCertificat médical récent ou présence en personne à la commune",
+      'service.driving_license_application.description':
+          "Demande d'un permis de conduire marocain (Catégorie B) pour la première fois.",
+      'service.driving_license_application.fees':
+          '300,00 DH — Catégorie B (frais voiture/moto standards variables)',
+      'service.driving_license_application.requiredDocs':
+          "CNIE\nCertificat médical d'aptitude\nPreuve de réussite des examens théorique et pratique\n4 photos d'identité",
+      'service.vehicle_registration.description':
+          "Immatriculation d'un véhicule neuf ou transféré auprès de l'autorité des transports.",
+      'service.vehicle_registration.fees':
+          'Variable selon le type de véhicule et la puissance fiscale — à partir de 350,00 DH',
+      'service.vehicle_registration.requiredDocs':
+          "CIN\nFacture d'achat ou document de transfert du véhicule\nAttestation d'assurance\nCertificat de visite technique",
+      'service.social_security_enrollment.description':
+          "Inscription au système de sécurité sociale pour l'assurance maladie, les allocations familiales et la retraite.",
+      'service.social_security_enrollment.fees':
+          "Gratuit — l'employeur prend en charge l'inscription",
+      'service.social_security_enrollment.requiredDocs':
+          "CNIE\nContrat de travail ou déclaration de l'employeur\nActe de naissance\nRelevé d'identité bancaire (RIB)",
+      'service.ramed_enrollment.description':
+          "Inscription au programme d'assistance médicale pour les ménages à faible revenu.",
+      'service.ramed_enrollment.fees':
+          'Gratuit — éligibilité sous conditions de ressources',
+      'service.ramed_enrollment.requiredDocs':
+          "CIN\nJustificatif de revenu ou certificat d'indigence\nLivret de famille",
+      'service.land_registry_extract.description':
+          "Extrait officiel du registre foncier confirmant la propriété et le statut juridique d'un bien.",
+      'service.land_registry_extract.fees': '150,00 DH',
+      'service.land_registry_extract.requiredDocs':
+          "CIN\nNuméro du titre foncier\nFormulaire de demande rempli",
+      'service.judicial_record.description':
+          "Certificat officiel de casier judiciaire, requis pour l'emploi, les visas et les démarches administratives.",
+      'service.judicial_record.fees':
+          'Gratuit — traité au tribunal local ou en ligne via les e-services',
+      'service.judicial_record.requiredDocs': "CNIE\nActe de naissance",
+      'service.tax_clearance_certificate.description':
+          "Certificat de l'administration fiscale confirmant l'absence de dettes fiscales.",
+      'service.tax_clearance_certificate.fees': 'Gratuit',
+      'service.tax_clearance_certificate.requiredDocs':
+          "CIN ou numéro d'immatriculation de la société\nNuméro d'identification fiscale\nDernière déclaration d'impôt",
     },
     'tzm': {
       'common.retry': 'Ɛreḍ daɣen',
@@ -403,6 +616,10 @@ class AppI18n {
       'profile.never': 'Ulac',
       'profile.appVersion': 'Lqem n usnas',
       'profile.nationalId': 'Asunan aɣerfan',
+      'profile.unnamedAccount': 'Amiḍan',
+      'profile.about': 'Ɣef',
+      'profile.bioOpen.subtitle':
+          'Asentem yal tikkelt mara teldiḍ asnas.',
       'profile.bioOpen': 'Sgel s biometric seld uftuḥ',
       'profile.bioSync': 'Biometric i usegdel',
       'profile.appLanguage': 'Tutlayt n usnas',
@@ -427,7 +644,19 @@ class AppI18n {
       'dashboard.services.subtitle': 'Wali tiddukliwin, isemli d yiseklasen imasinen.',
       'dashboard.recent.title': 'Tigawt taneggarut',
       'dashboard.recent.empty': 'Ulac tigawt. Snulfu QR-ik amezwaru.',
+      'dashboard.recent.seeAll': 'Wali akk',
       'dashboard.browseServices': 'Wali akk tiddukliwin',
+      'dashboard.offlineBanner':
+          'Bla tuqqna — QR-inek ad ttwasrasen mi d-tuɣal tuqqna.',
+      'profile.accountVerified': 'Tamagit tettwasebded',
+      'history.couldNotSave': 'Ur yezmir ara ad ikles QR-a deg umiḍan-ik.',
+      'history.status.submitted': 'Yettwazen',
+      'history.status.savedOnDevice': 'Yettwakles ɣef uselkim',
+      'history.status.couldNotSave': 'Akles yexṣer',
+      'serviceDetail.showAtCounter': 'Sken QR ɣef tewwurt',
+      'serviceDetail.submitSigned': 'Azen asuter yettwasign',
+      'serviceDetail.actionsHint':
+          'Sken QR ɣef tewwurt, neɣ azen asuter yettwasign s lebɛid.',
       'services.title': 'Tiddukliwin',
       'services.notSignedIn': 'Ulac tafrant. Kccem daɣen i usali n tiddukliwin.',
       'services.loadFailed': 'Ur yezmir ara ad yali tiddukliwin',
@@ -480,6 +709,87 @@ class AppI18n {
       'admin.verifyDocId': 'ID n umagrad yettwasign',
       'admin.verifySignature': 'Senqed asign',
       'admin.signatureValid': 'Asign yelha: {ok}\nHash: {hash}',
+      'service.birth_certificate.description':
+          'Asuter unsib n tnaslit n tnaslit n tlalit seg uregster amadan.',
+      'service.birth_certificate.fees':
+          '5,00 DH — taqamt deg wass-nni ma tella',
+      'service.birth_certificate.requiredDocs':
+          'CNIE n umaraw neɣ n win iqebbel\nAdlis n twacult\nAṣewweb n umaraw ma yella d ameẓyan',
+      'service.national_id_renewal.description':
+          'Asnefli neɣ asbeddi n tkarda taɣerfant tilektrunit (CNIE).',
+      'service.national_id_renewal.fees':
+          'Baṭel i usbeddi amezwaru — 40,00 DH i wid d-iteddun',
+      'service.national_id_renewal.requiredDocs':
+          'CNIE yekfan neɣ yexṣren\n2 tewlafin\nAsuter n tlalit',
+      'service.passport_application.description':
+          'Asuter n upaspur amaynut neɣ asnefli n win yellan.',
+      'service.passport_application.fees':
+          '500,00 DH — taqamt tamatut (4 ar 6 imalasen)',
+      'service.passport_application.requiredDocs':
+          'CNIE\nAsuter n tlalit\n4 tewlafin\nAtbu n usɣar\nTimber n tjebbawt',
+      'service.family_record_book.description':
+          'Adlis unsib i wesɣen n twacult, yettunefken di zwaǧ neɣ tlalit.',
+      'service.family_record_book.fees': 'Baṭel',
+      'service.family_record_book.requiredDocs':
+          'Asuter n uzwaǧ\nCNIE n sin n yergazen\nIsuteren n tlalit n warraw ma yella',
+      'service.marriage_certificate.description':
+          'Tanaslit n usuter n uzwaǧ seg uregster amadan.',
+      'service.marriage_certificate.fees': '5,00 DH',
+      'service.marriage_certificate.requiredDocs':
+          'CNIE n sin n yergazen\nUṭṭun n umaray n usuter n uzwaǧ amezwaru',
+      'service.death_certificate.description':
+          'Tanaslit unsibt n usuter n tmettant seg uregster amadan.',
+      'service.death_certificate.fees': '5,00 DH',
+      'service.death_certificate.requiredDocs':
+          'CNIE n yiwen seg twacult\nIsalan n tmagit n win yemmuten\nAsuter asnijya n tmettant ma yella',
+      'service.residence_certificate.description':
+          'Atbu unsib n usɣar yettunefken sɣur tjmaɛt taqlilit i usenqed n tansa.',
+      'service.residence_certificate.fees': '10,00 DH',
+      'service.residence_certificate.requiredDocs':
+          'CNIE\nTabuṣṣart (aman/tinikt — 3 wagguren ineggura) neɣ akrah\nAsuter n ukrah neɣ azamul n tlelli ma yella',
+      'service.certificate_of_life.description':
+          'Asuter n tudert i ttralan ifessasen n tneflit d wakuẓ ibarraniyen.',
+      'service.certificate_of_life.fees': '10,00 DH',
+      'service.certificate_of_life.requiredDocs':
+          'CNIE\nAsuter asnijya amaynut neɣ asentem-ik s timad-ik di tjmaɛt',
+      'service.driving_license_application.description':
+          'Asuter n tezmert n unhaṛ tamerrukit (Aɣanib B) i tikkelt tamezwarut.',
+      'service.driving_license_application.fees':
+          '300,00 DH — Aɣanib B (idriben n ttumubil/dṛaja ttbeddilen)',
+      'service.driving_license_application.requiredDocs':
+          'CNIE\nAsuter asnijya n tudert\nAtbu n ucinan n usenqed adyalan d uknad\n4 tewlafin',
+      'service.vehicle_registration.description':
+          'Aklasi n ttumubil tamaynut neɣ yettmuddun ɣer tdebbart n usaḍen.',
+      'service.vehicle_registration.fees':
+          'Yettbeddil s wanaw n ttumubil d tezmert tjebbawit — seg 350,00 DH',
+      'service.vehicle_registration.requiredDocs':
+          'CNIE\nFatura n usaɣ neɣ atbu n usakid\nAsuter n usegmel\nAsuter n usenqed atiknik',
+      'service.social_security_enrollment.description':
+          'Akcam ɣer unagraw n tɣellist tamettit i usegmel asnijya, tikciḍin n twacult, d tneflit.',
+      'service.social_security_enrollment.fees':
+          'Baṭel — bab n umahil ad iqdec aklasi',
+      'service.social_security_enrollment.requiredDocs':
+          'CNIE\nAsuter n umahil neɣ asnubeg n bab n umahil\nAsuter n tlalit\nIsalan n ubanka (RIB)',
+      'service.ramed_enrollment.description':
+          'Akcam ɣer wahil n tallelt tasnijya i twaculin tilemmasin n udrim.',
+      'service.ramed_enrollment.fees': 'Baṭel — s tilawin n udrim',
+      'service.ramed_enrollment.requiredDocs':
+          'CNIE\nAtbu n udrim neɣ asuter n tewzelt\nAdlis n twacult',
+      'service.land_registry_extract.description':
+          'Asuffeɣ unsib seg uregster n tmurt yesseflalin tanḍellt d wadeg azerfan.',
+      'service.land_registry_extract.fees': '150,00 DH',
+      'service.land_registry_extract.requiredDocs':
+          'CNIE\nUṭṭun n urzem n tmurt\nAfayl n usuter yeččuren',
+      'service.judicial_record.description':
+          'Asuter unsib n usaras azerfan, ittraǧa i umahil, vizat, d tegnaḍin tinedbalin.',
+      'service.judicial_record.fees':
+          'Baṭel — yettwaqdac di tsenbeḍt taqlilit neɣ s e-services',
+      'service.judicial_record.requiredDocs': 'CNIE\nAsuter n tlalit',
+      'service.tax_clearance_certificate.description':
+          'Asuter sɣur tnedbalt n yifka isefraran ulac iddebren n yifka.',
+      'service.tax_clearance_certificate.fees': 'Baṭel',
+      'service.tax_clearance_certificate.requiredDocs':
+          'CNIE neɣ uṭṭun n uklasi n tkebbanit\nUṭṭun n tmagit n yifka\nAsutter n yifka aneggaru',
     },
   };
 
