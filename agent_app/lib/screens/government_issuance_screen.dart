@@ -139,28 +139,6 @@ class _GovernmentIssuanceScreenState extends State<GovernmentIssuanceScreen> {
       ),
       body: Column(
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: const Color(0xFFE3F2FD),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.info_outline,
-                    color: Color(0xFF1565C0), size: 20),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'In production, this portal is only accessible to authorized government agents. It demonstrates how BridgeID accounts are created after in-person identity verification.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: const Color(0xFF0D47A1),
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
           Expanded(
             child: Stepper(
               currentStep: _currentStep,
@@ -463,29 +441,6 @@ class _IssuanceSuccessCard extends StatelessWidget {
                         color: Color(0xFF2E7D32)),
                   ),
                 ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF8E1),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFFFCC02)),
-          ),
-          child: const Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(Icons.info_outline, color: Color(0xFFF57F17), size: 18),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Inform the citizen of their temporary PIN. They must sign in to the citizen app and set a personal PIN immediately.',
-                  style: TextStyle(
-                      fontSize: 12, color: Color(0xFF5D4037), height: 1.4),
-                ),
               ),
             ],
           ),
