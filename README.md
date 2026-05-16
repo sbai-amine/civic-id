@@ -2,7 +2,7 @@
 
 Digital identity and civic services companion: secure sign-in, service catalog, signed service QR codes, offline-first sync, and an operations dashboard for administrators.
 
-**Author:** Ali
+**Author:** Mohammed Amine, Ali, Aymen
 
 ## Features
 
